@@ -144,12 +144,7 @@
         <!-- Order Buttons (For Client and Executor) -->
         <section class="order-buttons">
             <h3>Order Actions</h3>
-            <!-- Link to another page for accepting the order -->
-            <button onclick="window.location.href='oi.html'">Accept Order (Executor)</button>
-            <!-- Link to another page for placing the order -->
-            <button onclick="window.location.href='op.html'">Place Order (Customer)</button>
-            <!-- Link to another page for placing the order -->
-            <button onclick="window.location.href='ou.html'">Your Order (Customer)</button>
+            <p>Technicl work,ordered in tg @Askaroff</P>
         </section>
 
         <hr>
@@ -157,14 +152,7 @@
         <!-- Reviews Section -->
         <section class="reviews">
             <h2>Customer Reviews</h2>
-            <div id="reviewsContainer">
-                <div class="review">
-                    "Amazing service! My website looks fantastic." - John Doe
-                </div>
-                <div class="review">
-                    "The Telegram bot they made for my business is super helpful!" - Jane Smith
-                </div>
-            </div>
+            <div id="reviewsContainer"></div>
             <div class="review">
                 <h3>Leave a Review</h3>
                 <input type="text" id="reviewName" placeholder="Your Name">
@@ -175,22 +163,34 @@
     </div>
 
     <script>
-        // Chat message handler
-        function sendMessage() {
-            const chatBox = document.getElementById('chatBox');
-            const chatInput = document.getElementById('chatInput');
-            const roleSelector = document.getElementById('roleSelector');
-            const message = chatInput.value;
-            const role = roleSelector.value;
+        // Load saved reviews from localStorage
+        window.onload = function() {
+            loadReviews();
+        };
 
-            if (message.trim() !== "") {
-                const userMessage = document.createElement('div');
-                userMessage.className = role;
-                userMessage.textContent = `${role === 'customer' ? 'Customer' : 'Executor'}: ${message}`;
-                chatBox.appendChild(userMessage);
-                chatBox.scrollTop = chatBox.scrollHeight;
+        // Save reviews to localStorage
+        function saveReviews() {
+            const reviewsContainer = document.getElementById('reviewsContainer');
+            const reviews = [];
+            const reviewDivs = reviewsContainer.getElementsByClassName('review');
+            for (let i = 0; i < reviewDivs.length; i++) {
+                reviews.push(reviewDivs[i].textContent);
+            }
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+        }
 
-                chatInput.value = "";
+        // Load reviews from localStorage
+        function loadReviews() {
+            const reviewsContainer = document.getElementById('reviewsContainer');
+            const savedReviews = localStorage.getItem('reviews');
+            if (savedReviews) {
+                const reviews = JSON.parse(savedReviews);
+                reviews.forEach(review => {
+                    const div = document.createElement('div');
+                    div.className = 'review';
+                    div.textContent = review;
+                    reviewsContainer.appendChild(div);
+                });
             }
         }
 
@@ -204,7 +204,14 @@
                 const newReview = document.createElement('div');
                 newReview.className = 'review';
                 newReview.textContent = `"${text}" - ${name}`;
+
+                // If there are already 50 reviews, remove the first one
+                if (reviewsContainer.children.length >= 50) {
+                    reviewsContainer.removeChild(reviewsContainer.firstChild);
+                }
+
                 reviewsContainer.appendChild(newReview);
+                saveReviews(); // Save updated reviews to localStorage
 
                 document.getElementById('reviewName').value = '';
                 document.getElementById('reviewText').value = '';
@@ -215,4 +222,3 @@
     </script>
 </body>
 </html>
-
